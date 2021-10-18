@@ -1,0 +1,38 @@
+//*****************************单地址********************************
+  {
+    "Routes": [
+      {
+        //转发到下游服务地址--url变量
+        "DownstreamPathTemplate": "/api/{url}",
+        //下游http协议
+        "DownstreamScheme": "http",
+        //负载方式，
+        "LoadBalancerOptions": {
+          "Type": "RoundRobin" // 轮询
+        },
+        //上游地址
+        "UpstreamPathTemplate": "/T1/{url}", //网关地址--url变量   //冲突的还可以加权重Priority
+        "UpstreamHttpMethod": [ "GET", "POST", "DELETE", "PUT" ],
+        "UseServiceDisConvery": true, //使用服务发现
+        "ServiceName": "api", //Consul服务名称
+        //熔断设置,熔断器使用Polly
+        "QoSOptions": {
+          "ExceptionsAllowedBeforeBreaking": 3, //允许多少个异常请求
+          "DurationOfBreak": 10000, // 熔断的时间10s，单位为ms
+          "TimeoutValue": 5000 //单位ms,如果下游请求的处理时间超过多少则自动将请求设置为超时 默认90秒
+        }
+      }
+    ],
+    "GlobalConfiguration": {
+      //Ocelot应用对外地址
+      "BaseUrl": "http://172.16.2.9:5200",
+      "ServiceDiscoveryProvider": {
+        //Consul地址
+        "Host": "172.16.2.84",
+        //Consul端口
+        "Port": 8500,
+        "Type": "Consul" //由Consul提供服务发现，每次请求Consul
+      }
+    }
+  }
+
