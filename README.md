@@ -7,5 +7,7 @@
 
 3.ServerB为Consul服务注册
 
+4.IdentityServer4.Demo为IdentityServer4身份校验中心
+
 项目介绍地址为:https://www.cnblogs.com/wei325/p/15303859.html
 
