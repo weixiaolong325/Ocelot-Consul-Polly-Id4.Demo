@@ -20,6 +20,11 @@
           "ExceptionsAllowedBeforeBreaking": 3, //允许多少个异常请求
           "DurationOfBreak": 10000, // 熔断的时间10s，单位为ms
           "TimeoutValue": 5000 //单位ms,如果下游请求的处理时间超过多少则自动将请求设置为超时 默认90秒
+        },
+        //鉴权
+        "AuthenticationOptions": {
+          "AuthenticationProviderKey": "Bearer", //指定一个key
+          "AllowedScopes": [ "gatewayScope" ] //id4的作用域名称
         }
       }
     ],

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -16,6 +17,7 @@ namespace ConsulAndOcelot.Demo.ServerB.Controllers
         {
             _configuration = configuration;
         }
+        [Authorize]
         public IActionResult GetName()
         {
             string port = _configuration["port"];

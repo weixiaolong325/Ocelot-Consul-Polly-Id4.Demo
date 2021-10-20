@@ -1,3 +1,5 @@
+using IdentityServer4.AccessTokenValidation;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -27,6 +29,15 @@ namespace ConsulAndOcelot.Demo.Ocelot
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            var authenticationProviderKey = "Bearer"; //这个为上面配置里的key
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddIdentityServerAuthentication(authenticationProviderKey, options =>
+                {
+                    options.Authority = "http://localhost:5000";//id4服务地址
+                   options.ApiName = "server1";//id4 api资源里的apiname
+                   options.RequireHttpsMetadata = false; //不使用https
+                   options.SupportedTokens = SupportedTokens.Both;
+                });
             services.AddOcelot()
                 .AddConsul()
                 .AddPolly();

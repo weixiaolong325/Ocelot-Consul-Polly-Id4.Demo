@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <PackageReference Include="Consul" Version="1.6.10.3" />
+    <PackageReference Include="IdentityServer4.AccessTokenValidation" Version="3.0.1" />
     <PackageReference Include="Ocelot" Version="17.0.0" />
     <PackageReference Include="Ocelot.Provider.Consul" Version="17.0.0" />
     <PackageReference Include="Ocelot.Provider.Polly" Version="17.0.0" />

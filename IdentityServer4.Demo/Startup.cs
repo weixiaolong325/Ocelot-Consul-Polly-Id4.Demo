@@ -1,20 +1,15 @@
-using ConsulAndOcelot.Demo.ServerB.Utils;
-using IdentityServer4.AccessTokenValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Encodings.Web;
-using System.Text.Unicode;
 using System.Threading.Tasks;
 
-namespace ConsulAndOcelot.Demo.ServerB
+namespace IdentityServer4.Demo
 {
     public class Startup
     {
@@ -28,21 +23,27 @@ namespace ConsulAndOcelot.Demo.ServerB
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllersWithViews();
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                       .AddIdentityServerAuthentication(options =>
-                       {
-                           options.Authority = "http://localhost:5000";//id4服务地址
-                            options.ApiName = "server1";//id4 api资源里的apiname
-                            options.RequireHttpsMetadata = false; //不使用https
-                            options.SupportedTokens = SupportedTokens.Both;
-                       });
-            services.AddControllers().AddJsonOptions(cfg =>
-            {
-                cfg.JsonSerializerOptions.Encoder = JavaScriptEncoder.Create(UnicodeRanges.All);
-            });
-            services.AddSingleton<OrderService>();
+            #region 内存方式
+            services.AddIdentityServer()
+                .AddDeveloperSigningCredential()
+                .AddInMemoryApiResources(Config.ApiResources)
+                .AddInMemoryClients(Config.Clients)
+                .AddInMemoryApiScopes(Config.ApiScopes) //4.x新加
+                .AddInMemoryIdentityResources(Config.IdentityResources)
+                .AddTestUsers(Config.GetTestUsers());
 
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+     .AddJwtBearer(options =>
+     {
+            //IdentityServer地址
+            options.Authority = "http://localhost:5000";
+            //对应Idp中ApiResource的Name
+            options.Audience = "server1";
+            //不使用https
+            options.RequireHttpsMetadata = false;
+     });
+            #endregion
+            services.AddControllersWithViews();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -55,13 +56,11 @@ namespace ConsulAndOcelot.Demo.ServerB
             else
             {
                 app.UseExceptionHandler("/Home/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-                app.UseHsts();
             }
-            app.UseHttpsRedirection();
             app.UseStaticFiles();
 
             app.UseRouting();
+            app.UseIdentityServer();
             app.UseAuthentication();
             app.UseAuthorization();
 
@@ -71,8 +70,6 @@ namespace ConsulAndOcelot.Demo.ServerB
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
             });
-            //Consul注册
-            app.UseConsul(Configuration);
         }
     }
 }
